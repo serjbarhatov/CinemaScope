@@ -20,48 +20,146 @@ function storeAndGoToDetailsNewTab(movie) {
   window.open(`details.html?id=${movie.id}`, '_blank');
 }
 
-// --- INDEX PAGE LOGIC ---
-if (document.getElementById('searchForm')) {
-  document.getElementById('searchForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const title = document.getElementById('title').value;
-    const partialTitle = document.getElementById('partialTitle') ? document.getElementById('partialTitle').value : '';
-    const genre = document.getElementById('genre').value;
-    const rating = document.getElementById('rating').value;
-    const year = document.getElementById('year').value;
-    const resultsCount = document.getElementById('resultsCount').value;
-    
-    let url = `https://${RAPIDAPI_HOST}/api/imdb/search?type=movie&rows=${resultsCount}`;
-    if (title) url += `&primaryTitle=${encodeURIComponent(title)}`;
-    if (partialTitle) url += `&primaryTitleAutocomplete=${encodeURIComponent(partialTitle)}`;
-    if (genre) url += `&genre=${encodeURIComponent(genre)}`;
-    if (rating) url += `&averageRatingFrom=${rating}`;
-    if (year) url += `&startYearFrom=${year}`;
-    url += `&sortOrder=ASC&sortField=id`;
-
-    document.getElementById('results').innerHTML = '<div class="col-span-full text-center">Loading...</div>';
-    try {
-      const res = await fetch(url, {
-        headers: {
-          'x-rapidapi-key': RAPIDAPI_KEY,
-          'x-rapidapi-host': RAPIDAPI_HOST
-        }
-      });
-      const data = await res.json();
-      renderResults(data.results || []);
-    } catch (err) {
-      document.getElementById('results').innerHTML = '<div class="col-span-full text-center text-red-400">Error loading movies.</div>';
+// --- SLIDER INIT ---
+window.addEventListener('DOMContentLoaded', () => {
+  // Year slider
+  const yearSlider = document.getElementById('year-slider');
+  noUiSlider.create(yearSlider, {
+    start: [1990, 2025],
+    connect: true,
+    step: 1,
+    range: {
+      'min': 1920,
+      'max': 2025
+    },
+    tooltips: false,
+    format: {
+      to: value => Math.round(value),
+      from: value => Number(value)
     }
   });
-  // Clear filters button
-  const clearBtn = document.getElementById('clearFilters');
-  if (clearBtn) {
-    clearBtn.onclick = () => {
-      document.getElementById('searchForm').reset();
-      document.getElementById('results').innerHTML = '';
-    };
+  const yearValue = document.getElementById('year-slider-value');
+  yearSlider.noUiSlider.on('update', (values) => {
+    yearValue.textContent = `${values[0]} - ${values[1]}`;
+  });
+
+  // Rating slider (default 7+)
+  const ratingSlider = document.getElementById('rating-slider');
+  noUiSlider.create(ratingSlider, {
+    start: [7, 10],
+    connect: true,
+    step: 0.1,
+    range: {
+      'min': 0,
+      'max': 10
+    },
+    tooltips: false,
+    format: {
+      to: value => Number(value).toFixed(1),
+      from: value => Number(value)
+    }
+  });
+  const ratingValue = document.getElementById('rating-slider-value');
+  ratingSlider.noUiSlider.on('update', (values) => {
+    ratingValue.textContent = `${values[0]} - ${values[1]}`;
+  });
+
+  // Votes slider (max 1,000,000+, default 20,000+)
+  const votesSlider = document.getElementById('votes-slider');
+  noUiSlider.create(votesSlider, {
+    start: [20000, 1000000],
+    connect: true,
+    step: 100,
+    range: {
+      'min': 0,
+      'max': 1000000
+    },
+    tooltips: false,
+    format: {
+      to: value => Math.round(value),
+      from: value => Number(value)
+    }
+  });
+  const votesValue = document.getElementById('votes-slider-value');
+  votesSlider.noUiSlider.on('update', (values) => {
+    const format = n => n >= 1000 ? n.toLocaleString() : n;
+    let maxLabel = values[1] >= 1000000 ? '1,000,000+' : format(values[1]);
+    votesValue.textContent = `${format(values[0])} - ${maxLabel}`;
+  });
+
+  // Results slider (1 to 20, default 6)
+  const resultsSlider = document.getElementById('results-slider');
+  noUiSlider.create(resultsSlider, {
+    start: 6,
+    connect: [true, false],
+    step: 1,
+    range: {
+      'min': 1,
+      'max': 20
+    },
+    tooltips: false,
+    format: {
+      to: value => Math.round(value),
+      from: value => Number(value)
+    }
+  });
+  const resultsValue = document.getElementById('results-slider-value');
+  resultsSlider.noUiSlider.on('update', (values) => {
+    resultsValue.textContent = `${values[0]} movies`;
+  });
+
+  // --- INDEX PAGE LOGIC ---
+  if (document.getElementById('searchForm')) {
+    document.getElementById('searchForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const partialTitle = document.getElementById('partialTitle') ? document.getElementById('partialTitle').value : '';
+      const genre = document.getElementById('genre').value;
+      const [startYear, endYear] = yearSlider.noUiSlider.get();
+      const [minRating, maxRating] = ratingSlider.noUiSlider.get();
+      const [minVotes, maxVotes] = votesSlider.noUiSlider.get();
+      const resultsCount = resultsSlider.noUiSlider.get();
+
+      let url = `https://${RAPIDAPI_HOST}/api/imdb/search?type=movie&rows=${resultsCount}`;
+      if (title) url += `&primaryTitle=${encodeURIComponent(title)}`;
+      if (partialTitle) url += `&primaryTitleAutocomplete=${encodeURIComponent(partialTitle)}`;
+      if (genre) url += `&genre=${encodeURIComponent(genre)}`;
+      if (minRating) url += `&averageRatingFrom=${minRating}`;
+      if (maxRating) url += `&averageRatingTo=${maxRating}`;
+      if (minVotes) url += `&numVotesFrom=${minVotes}`;
+      if (maxVotes && maxVotes < 1000000) url += `&numVotesTo=${maxVotes}`;
+      if (startYear) url += `&startYearFrom=${startYear}`;
+      if (endYear) url += `&startYearTo=${endYear}`;
+      url += `&sortOrder=ASC&sortField=id`;
+
+      document.getElementById('results').innerHTML = '<div class="col-span-full text-center">Loading...</div>';
+      try {
+        const res = await fetch(url, {
+          headers: {
+            'x-rapidapi-key': RAPIDAPI_KEY,
+            'x-rapidapi-host': RAPIDAPI_HOST
+          }
+        });
+        const data = await res.json();
+        renderResults(data.results || []);
+      } catch (err) {
+        document.getElementById('results').innerHTML = '<div class="col-span-full text-center text-red-400">Error loading movies.</div>';
+      }
+    });
+    // Clear filters button
+    const clearBtn = document.getElementById('clearFilters');
+    if (clearBtn) {
+      clearBtn.onclick = () => {
+        document.getElementById('searchForm').reset();
+        yearSlider.noUiSlider.set([1990, 2025]);
+        ratingSlider.noUiSlider.set([7, 10]);
+        votesSlider.noUiSlider.set([20000, 1000000]);
+        resultsSlider.noUiSlider.set(6);
+        document.getElementById('results').innerHTML = '';
+      };
+    }
   }
-}
+});
 
 function renderResults(movies) {
   const results = document.getElementById('results');
