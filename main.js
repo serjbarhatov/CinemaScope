@@ -1,28 +1,22 @@
-// Replace with your actual RapidAPI key
-const RAPIDAPI_KEY = 'dec7766617msh618ec3ee6b5fcb5p194818jsndf7de196ccb1';
+const RAPIDAPI_KEY = '215b7c1e0cmshec18dda2ac941b3p13d019jsn71520e0821fa';
 const RAPIDAPI_HOST = 'imdb236.p.rapidapi.com';
 
-// Helper to get query param
 function getQueryParam(name) {
   const url = new URL(window.location.href);
   return url.searchParams.get(name);
 }
 
-// Store movie in localStorage and go to details page
 function storeAndGoToDetails(movie) {
   localStorage.setItem('selectedMovie', JSON.stringify(movie));
   window.location.href = `details.html?id=${movie.id}`;
 }
 
-// Open details in a new tab and store movie in localStorage
 function storeAndGoToDetailsNewTab(movie) {
   localStorage.setItem('selectedMovie', JSON.stringify(movie));
   window.open(`details.html?id=${movie.id}`, '_blank');
 }
 
-// --- SLIDER INIT ---
 window.addEventListener('DOMContentLoaded', () => {
-  // Year slider
   const yearSlider = document.getElementById('year-slider');
   noUiSlider.create(yearSlider, {
     start: [1990, 2025],
@@ -43,7 +37,6 @@ window.addEventListener('DOMContentLoaded', () => {
     yearValue.textContent = `${values[0]} - ${values[1]}`;
   });
 
-  // Rating slider (default 7+)
   const ratingSlider = document.getElementById('rating-slider');
   noUiSlider.create(ratingSlider, {
     start: [7, 10],
@@ -64,7 +57,6 @@ window.addEventListener('DOMContentLoaded', () => {
     ratingValue.textContent = `${values[0]} - ${values[1]}`;
   });
 
-  // Votes slider (max 1,000,000+, default 20,000+)
   const votesSlider = document.getElementById('votes-slider');
   noUiSlider.create(votesSlider, {
     start: [20000, 1000000],
@@ -87,7 +79,6 @@ window.addEventListener('DOMContentLoaded', () => {
     votesValue.textContent = `${format(values[0])} - ${maxLabel}`;
   });
 
-  // Results slider (1 to 20, default 6)
   const resultsSlider = document.getElementById('results-slider');
   noUiSlider.create(resultsSlider, {
     start: 6,
@@ -108,7 +99,6 @@ window.addEventListener('DOMContentLoaded', () => {
     resultsValue.textContent = `${values[0]} movies`;
   });
 
-  // --- INDEX PAGE LOGIC ---
   if (document.getElementById('searchForm')) {
     document.getElementById('searchForm').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -146,7 +136,6 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('results').innerHTML = '<div class="col-span-full text-center text-red-400">Error loading movies.</div>';
       }
     });
-    // Clear filters button
     const clearBtn = document.getElementById('clearFilters');
     if (clearBtn) {
       clearBtn.onclick = () => {
@@ -181,11 +170,9 @@ function renderResults(movies) {
       </div>
     </div>
   `).join('');
-  // Scroll to results
   results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// --- DETAILS PAGE LOGIC ---
 if (document.getElementById('movieDetails')) {
   (function() {
     const movieStr = localStorage.getItem('selectedMovie');
