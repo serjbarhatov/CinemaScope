@@ -14,6 +14,12 @@ function storeAndGoToDetails(movie) {
   window.location.href = `details.html?id=${movie.id}`;
 }
 
+// Open details in a new tab and store movie in localStorage
+function storeAndGoToDetailsNewTab(movie) {
+  localStorage.setItem('selectedMovie', JSON.stringify(movie));
+  window.open(`details.html?id=${movie.id}`, '_blank');
+}
+
 // --- INDEX PAGE LOGIC ---
 if (document.getElementById('searchForm')) {
   document.getElementById('searchForm').addEventListener('submit', async function(e) {
@@ -64,7 +70,7 @@ function renderResults(movies) {
     return;
   }
   results.innerHTML = movies.map(movie => `
-    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col items-center cursor-pointer hover:bg-opacity-30 hover:scale-105 transition-all duration-200 border border-white/10" onclick='storeAndGoToDetails(${JSON.stringify(movie).replace(/'/g, "&#39;")})'>
+    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col items-center cursor-pointer hover:bg-opacity-30 hover:scale-105 transition-all duration-200 border border-white/10" onclick='storeAndGoToDetailsNewTab(${JSON.stringify(movie).replace(/'/g, "&#39;")})'>
       <div class="w-full aspect-[2/3] rounded-xl overflow-hidden mb-3 bg-gray-900 flex items-center justify-center">
         <img src="${movie.primaryImage || 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.primaryTitle}" class="object-cover w-full h-full"/>
       </div>
@@ -105,31 +111,43 @@ function renderDetails(movie) {
   const languages = movie.spokenLanguages || [];
 
   document.getElementById('movieDetails').innerHTML = `
-    <div class="w-full md:w-1/3 flex-shrink-0 flex flex-col items-center">
-      <div class="w-full aspect-[2/3] rounded-xl overflow-hidden shadow-lg mb-4 bg-gray-900 flex items-center justify-center">
-        <img src="${image}" alt="${title}" class="object-cover w-full h-full"/>
+    <div class="flex flex-col md:flex-row gap-8 w-full items-center justify-center">
+      <div class="w-full md:w-1/3 flex-shrink-0 flex flex-col items-center">
+        <div class="w-full aspect-[2/3] rounded-xl overflow-hidden shadow-lg mb-4 bg-gray-900 flex items-center justify-center">
+          <img src="${image}" alt="${title}" class="object-cover w-full h-full"/>
+        </div>
+        <a href="${movie.url || '#'}" target="_blank" class="w-full mt-2">
+          <button class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl p-3 font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition mb-2">
+            <span>▶️</span> Watch Now
+          </button>
+        </a>
       </div>
-      <a href="${movie.url || '#'}" target="_blank" class="w-full mt-2">
-        <button class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl p-3 font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition mb-2">
-          <span>▶️</span> Watch Now
-        </button>
-      </a>
-    </div>
-    <div class="flex-1 flex flex-col gap-2 justify-center">
-      <div class="flex flex-wrap items-center gap-2 mb-2">
-        <span class="text-3xl font-extrabold">${title}</span>
-        ${genres.map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}
-      </div>
-      <div class="flex flex-wrap gap-4 text-base text-gray-200 mb-2">
-        <span class="bg-yellow-400 text-black px-2 py-0.5 rounded-full font-bold">⭐ ${rating}</span>
-        <span class="bg-blue-500 text-white px-2 py-0.5 rounded-full">${votes} votes</span>
-        <span class="bg-green-500 text-white px-2 py-0.5 rounded-full">${year}</span>
-        <span class="bg-purple-500 text-white px-2 py-0.5 rounded-full">${runtime} min</span>
-      </div>
-      <div class="text-base mb-2">${description}</div>
-      <div class="flex flex-wrap gap-2 mt-4">
-        ${countries.map(c=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs'>${c}</span>`).join('')}
-        ${languages.map(l=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs'>${l}</span>`).join('')}
+      <div class="flex-1 flex flex-col gap-4 justify-center">
+        <div>
+          <span class="text-3xl font-extrabold">${title}</span>
+        </div>
+        <div>
+          <span class="font-semibold text-pink-300">Genres:</span> ${genres.map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold ml-1'>${g}</span>`).join('')}
+        </div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="font-semibold text-pink-300">Info:</span>
+          <span class="bg-yellow-400 text-black px-2 py-0.5 rounded-full font-bold">⭐ ${rating}</span>
+          <span class="bg-blue-500 text-white px-2 py-0.5 rounded-full">${votes} votes</span>
+          <span class="bg-green-500 text-white px-2 py-0.5 rounded-full">${year}</span>
+          <span class="bg-purple-500 text-white px-2 py-0.5 rounded-full">${runtime} min</span>
+        </div>
+        <div>
+          <span class="font-semibold text-pink-300">Description:</span>
+          <div class="text-base mt-1">${description}</div>
+        </div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="font-semibold text-pink-300">Country:</span>
+          ${countries.map(c=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${c}</span>`).join('')}
+        </div>
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="font-semibold text-pink-300">Language:</span>
+          ${languages.map(l=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${l}</span>`).join('')}
+        </div>
       </div>
     </div>
   `;
