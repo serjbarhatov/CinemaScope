@@ -13,13 +13,15 @@ if (document.getElementById('searchForm')) {
   document.getElementById('searchForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const title = document.getElementById('title').value;
+    const partialTitle = document.getElementById('partialTitle') ? document.getElementById('partialTitle').value : '';
     const genre = document.getElementById('genre').value;
     const rating = document.getElementById('rating').value;
     const year = document.getElementById('year').value;
     const resultsCount = document.getElementById('resultsCount').value;
     
     let url = `https://${RAPIDAPI_HOST}/api/imdb/search?type=movie&rows=${resultsCount}`;
-    if (title) url += `&primaryTitleAutocomplete=${encodeURIComponent(title)}`;
+    if (title) url += `&primaryTitle=${encodeURIComponent(title)}`;
+    if (partialTitle) url += `&primaryTitleAutocomplete=${encodeURIComponent(partialTitle)}`;
     if (genre) url += `&genre=${encodeURIComponent(genre)}`;
     if (rating) url += `&averageRatingFrom=${rating}`;
     if (year) url += `&startYearFrom=${year}`;
@@ -39,6 +41,14 @@ if (document.getElementById('searchForm')) {
       document.getElementById('results').innerHTML = '<div class="col-span-full text-center text-red-400">Error loading movies.</div>';
     }
   });
+  // Clear filters button
+  const clearBtn = document.getElementById('clearFilters');
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      document.getElementById('searchForm').reset();
+      document.getElementById('results').innerHTML = '';
+    };
+  }
 }
 
 function renderResults(movies) {
@@ -48,12 +58,17 @@ function renderResults(movies) {
     return;
   }
   results.innerHTML = movies.map(movie => `
-    <div class="bg-white bg-opacity-10 rounded-lg p-3 flex flex-col items-center cursor-pointer hover:bg-opacity-20 transition" onclick="window.location.href='details.html?id=${movie.id}'">
-      <img src="${movie.primaryImage || 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.primaryTitle}" class="w-full h-48 object-cover rounded mb-2"/>
-      <div class="font-bold text-lg text-center">${movie.primaryTitle}</div>
-      <div class="text-sm text-gray-300 mb-1">${movie.startYear || ''}</div>
-      <div class="flex flex-wrap gap-1 justify-center">${(movie.genres||[]).map(g=>`<span class='bg-pink-500 text-xs px-2 py-0.5 rounded'>${g}</span>`).join('')}</div>
-      <div class="text-xs text-gray-400 mt-1">${movie.averageRating ? `⭐ ${movie.averageRating}` : ''} ${movie.numVotes ? `(${movie.numVotes} votes)` : ''}</div>
+    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col items-center cursor-pointer hover:bg-opacity-30 hover:scale-105 transition-all duration-200 border border-white/10" onclick="window.location.href='details.html?id=${movie.id}'">
+      <div class="w-full aspect-[2/3] rounded-xl overflow-hidden mb-3 bg-gray-900 flex items-center justify-center">
+        <img src="${movie.primaryImage || 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.primaryTitle}" class="object-cover w-full h-full"/>
+      </div>
+      <div class="font-extrabold text-lg text-center mb-1">${movie.primaryTitle}</div>
+      <div class="text-xs text-gray-300 mb-2">${movie.startYear || ''}</div>
+      <div class="flex flex-wrap gap-1 justify-center mb-2">${(movie.genres||[]).map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}</div>
+      <div class="flex items-center gap-2 text-xs text-gray-200">
+        ${movie.averageRating ? `<span class='bg-yellow-400 text-black px-2 py-0.5 rounded-full font-bold'>⭐ ${movie.averageRating}</span>` : ''}
+        ${movie.numVotes ? `<span class='bg-blue-500 text-white px-2 py-0.5 rounded-full'>${movie.numVotes.toLocaleString()} votes</span>` : ''}
+      </div>
     </div>
   `).join('');
 }
@@ -85,21 +100,34 @@ if (document.getElementById('movieDetails')) {
 
 function renderDetails(movie) {
   document.getElementById('movieDetails').innerHTML = `
-    <img src="${movie.primaryImage || 'https://via.placeholder.com/200x300?text=No+Image'}" alt="${movie.primaryTitle}" class="w-full md:w-1/3 h-64 object-cover rounded mb-4 md:mb-0 md:mr-4"/>
-    <div class="flex-1 flex flex-col gap-2">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl font-bold">${movie.primaryTitle}</span>
-        <span class="bg-pink-500 text-xs px-2 py-0.5 rounded">${(movie.genres||[]).join(', ')}</span>
+    <div class="w-full md:w-1/3 flex-shrink-0 flex flex-col items-center">
+      <div class="w-full aspect-[2/3] rounded-xl overflow-hidden shadow-lg mb-4 bg-gray-900 flex items-center justify-center">
+        <img src="${movie.primaryImage || 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.primaryTitle}" class="object-cover w-full h-full"/>
       </div>
-      <div class="flex gap-4 text-sm text-gray-300">
-        <span>⭐ ${movie.averageRating || '-'}</span>
-        <span>${movie.startYear || '-'}</span>
-        <span>${movie.runtimeMinutes ? movie.runtimeMinutes + ' min' : ''}</span>
+      <a href="https://www.imdb.com/title/${movie.id}/" target="_blank" class="w-full mt-2">
+        <button class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl p-3 font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition mb-2">
+          <span>▶️</span> Watch Now
+        </button>
+      </a>
+    </div>
+    <div class="flex-1 flex flex-col gap-2 justify-center">
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <span class="text-3xl font-extrabold">${movie.primaryTitle}</span>
+        ${(movie.genres||[]).map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}
       </div>
-      <div class="text-sm">${movie.description || ''}</div>
-      <div class="text-sm"><b>Director:</b> ${(movie.directors||[]).map(d=>d.name).join(', ') || '-'}</div>
-      <div class="text-sm"><b>Cast:</b> ${(movie.cast||[]).slice(0,5).map(c=>c.name).join(', ') || '-'}</div>
-      <div class="text-xs text-gray-400 mt-2">IMDb: <a href="https://www.imdb.com/title/${movie.id}/" target="_blank" class="underline">View on IMDb</a></div>
+      <div class="flex flex-wrap gap-4 text-base text-gray-200 mb-2">
+        <span class="bg-yellow-400 text-black px-2 py-0.5 rounded-full font-bold">⭐ ${movie.averageRating || '-'}</span>
+        <span class="bg-blue-500 text-white px-2 py-0.5 rounded-full">${movie.numVotes ? movie.numVotes.toLocaleString() + ' votes' : ''}</span>
+        <span class="bg-green-500 text-white px-2 py-0.5 rounded-full">${movie.startYear || '-'}</span>
+        <span class="bg-purple-500 text-white px-2 py-0.5 rounded-full">${movie.runtimeMinutes ? movie.runtimeMinutes + ' min' : ''}</span>
+      </div>
+      <div class="text-base mb-2">${movie.description || ''}</div>
+      <div class="text-base"><b>Director:</b> ${(movie.directors||[]).map(d=>d.name).join(', ') || '-'}</div>
+      <div class="text-base"><b>Cast:</b> ${(movie.cast||[]).slice(0,5).map(c=>c.name).join(', ') || '-'}</div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        ${(movie.countriesOfOrigin||[]).map(c=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs'>${c}</span>`).join('')}
+        ${(movie.spokenLanguages||[]).map(l=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs'>${l}</span>`).join('')}
+      </div>
     </div>
   `;
 } 
