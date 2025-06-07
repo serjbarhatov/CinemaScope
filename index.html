@@ -9,15 +9,39 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
   <style>
-    body { font-family: 'Montserrat', sans-serif; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #5f2c82 0%, #1a0532 100%);
+    }
     .noUi-target { background: #fff3; border-radius: 9999px; border: none; box-shadow: 0 2px 8px #0002; }
     .noUi-connect { background: linear-gradient(90deg, #ec4899, #8b5cf6); }
     .noUi-horizontal .noUi-handle { border-radius: 9999px; background: #fff; border: 2px solid #ec4899; box-shadow: 0 2px 8px #0002; }
     .noUi-tooltip { background: #fff; color: #1a0532; border-radius: 6px; font-weight: bold; }
+    @keyframes blob1 {
+      0%,100% { transform: translateY(0) scale(1);}
+      50% { transform: translateY(-40px) scale(1.1);}
+    }
+    @keyframes blob2 {
+      0%,100% { transform: translateX(0) scale(1);}
+      50% { transform: translateX(60px) scale(1.05);}
+    }
+    @keyframes blob3 {
+      0%,100% { transform: translateY(0) scale(1);}
+      50% { transform: translateY(40px) scale(1.15);}
+    }
+    .animate-blob1 { animation: blob1 12s ease-in-out infinite; }
+    .animate-blob2 { animation: blob2 16s ease-in-out infinite; }
+    .animate-blob3 { animation: blob3 14s ease-in-out infinite; }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-b from-[#1a0532] via-[#3a1c71] to-[#5f2c82] text-white flex flex-col justify-center items-center">
-  <div class="w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto p-4 flex flex-col items-center">
+<body class="min-h-screen text-white flex flex-col justify-center items-center">
+  <!-- Animated Blobs Background -->
+  <div class="pointer-events-none fixed inset-0 z-0">
+    <div class="absolute top-10 left-1/4 w-72 h-72 bg-pink-500 opacity-30 rounded-full filter blur-3xl animate-blob1"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 opacity-20 rounded-full filter blur-3xl animate-blob2"></div>
+    <div class="absolute top-1/2 right-10 w-60 h-60 bg-blue-400 opacity-20 rounded-full filter blur-2xl animate-blob3"></div>
+  </div>
+  <div class="relative w-full max-w-lg md:max-w-2xl lg:max-w-4xl mx-auto p-4 flex flex-col items-center z-10">
     <div class="flex items-center gap-2 mb-2 mt-6">
       <span class="bg-pink-600 rounded-lg p-2 text-2xl">🎬</span>
       <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-lg">CinemaScope</h1>

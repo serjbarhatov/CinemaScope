@@ -181,6 +181,8 @@ function renderResults(movies) {
       </div>
     </div>
   `).join('');
+  // Scroll to results
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // --- DETAILS PAGE LOGIC ---
