@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Picker</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-b from-purple-900 to-indigo-900 min-h-screen text-white">
+  <div class="max-w-md md:max-w-2xl lg:max-w-4xl mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-2 text-center">🎬 Movie Picker</h1>
+    <p class="text-center mb-6">Find the perfect movie for your movie night!</p>
+    <form id="searchForm" class="bg-white bg-opacity-10 rounded-lg p-4 mb-6 flex flex-col gap-3">
+      <input type="text" id="title" placeholder="Movie Title" class="rounded p-2 text-black" />
+      <select id="genre" class="rounded p-2 text-black">
+        <option value="">Any Genre</option>
+        <option value="Action">Action</option>
+        <option value="Comedy">Comedy</option>
+        <option value="Drama">Drama</option>
+        <option value="Sci-Fi">Sci-Fi</option>
+        <option value="Horror">Horror</option>
+        <option value="Romance">Romance</option>
+      </select>
+      <select id="rating" class="rounded p-2 text-black">
+        <option value="">Any Rating</option>
+        <option value="9">9+</option>
+        <option value="8">8+</option>
+        <option value="7">7+</option>
+        <option value="6">6+</option>
+      </select>
+      <select id="year" class="rounded p-2 text-black">
+        <option value="">Any Year</option>
+        <option value="2020">2020+</option>
+        <option value="2010">2010+</option>
+        <option value="2000">2000+</option>
+        <option value="1990">1990+</option>
+      </select>
+      <select id="resultsCount" class="rounded p-2 text-black">
+        <option value="6">6 movies</option>
+        <option value="10">10 movies</option>
+        <option value="20">20 movies</option>
+      </select>
+      <button type="submit" class="bg-pink-600 hover:bg-pink-700 rounded p-2 font-bold mt-2">Discover Movies</button>
+    </form>
+    <div id="results" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html> 
