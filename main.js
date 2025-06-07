@@ -209,6 +209,8 @@ function renderDetails(movie) {
   const description = movie.description || '';
   const countries = movie.countriesOfOrigin || [];
   const languages = movie.spokenLanguages || [];
+  const trailer = movie.trailer || '';
+  const imdbUrl = movie.url || '#';
 
   document.getElementById('movieDetails').innerHTML = `
     <div class="flex flex-col md:flex-row gap-8 w-full items-center justify-center">
@@ -216,9 +218,16 @@ function renderDetails(movie) {
         <div class="w-full aspect-[2/3] rounded-xl overflow-hidden shadow-lg mb-4 bg-gray-900 flex items-center justify-center">
           <img src="${image}" alt="${title}" class="object-cover w-full h-full"/>
         </div>
-        <a href="${movie.url || '#'}" target="_blank" class="w-full mt-2">
+        ${trailer ? `
+        <a href="${trailer}" target="_blank" class="w-full mt-2">
           <button class="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 rounded-xl p-3 font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition mb-2">
-            <span>▶️</span> Watch Now
+            <span>▶️</span> Watch Trailer
+          </button>
+        </a>
+        ` : ''}
+        <a href="${imdbUrl}" target="_blank" class="w-full">
+          <button class="w-full bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black rounded-xl p-3 font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition mb-2">
+            <span>ℹ️</span> More Info
           </button>
         </a>
       </div>
