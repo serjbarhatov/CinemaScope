@@ -174,18 +174,37 @@ function renderResults(movies) {
 }
 
 if (document.getElementById('movieDetails')) {
-  (function() {
+  (async function() {
     const movieStr = localStorage.getItem('selectedMovie');
     if (!movieStr) {
       document.getElementById('movieDetails').innerHTML = '<div class="text-red-400">Movie not found.</div>';
       return;
     }
     const movie = JSON.parse(movieStr);
-    renderDetails(movie);
+    const movieId = movie.id;
+    
+    document.getElementById('movieDetails').innerHTML = '<div class="w-full text-center">Loading...</div>';
+    
+    try {
+      const [movieData, directorsData] = await Promise.all([
+        Promise.resolve(movie),
+        fetch(`https://${RAPIDAPI_HOST}/api/imdb/${movieId}/directors`, {
+          headers: {
+            'x-rapidapi-key': RAPIDAPI_KEY,
+            'x-rapidapi-host': RAPIDAPI_HOST
+          }
+        }).then(res => res.json())
+      ]);
+      
+      renderDetails(movieData, directorsData);
+    } catch (err) {
+      console.error('Error loading movie details:', err);
+      document.getElementById('movieDetails').innerHTML = '<div class="text-red-400">Error loading movie details.</div>';
+    }
   })();
 }
 
-function renderDetails(movie) {
+function renderDetails(movie, directors = []) {
   const image = movie.primaryImage || 'https://via.placeholder.com/300x450?text=No+Image';
   const title = movie.primaryTitle || 'No Title';
   const genres = movie.genres || [];
@@ -198,6 +217,12 @@ function renderDetails(movie) {
   const languages = movie.spokenLanguages || [];
   const trailer = movie.trailer || '';
   const imdbUrl = movie.url || '#';
+  
+  let directorLine = '';
+  if (directors && Array.isArray(directors) && directors.length > 0) {
+    const directorNames = directors.map(d => d.fullName).join(', ');
+    directorLine = `<div class='mt-2 text-base'><span class="font-semibold text-pink-300">Directed by:</span> ${directorNames}</div>`;
+  }
 
   document.getElementById('movieDetails').innerHTML = `
     <div class="flex flex-col md:flex-row gap-8 w-full items-center justify-center">
@@ -236,6 +261,7 @@ function renderDetails(movie) {
           <span class="font-semibold text-pink-300">Description:</span>
           <div class="text-base mt-1">${description}</div>
         </div>
+        ${directorLine}
         <div class="flex flex-wrap gap-2 items-center">
           <span class="font-semibold text-pink-300">Country:</span>
           ${countries.map(c=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${c}</span>`).join('')}
