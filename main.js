@@ -157,18 +157,18 @@ function renderResults(movies) {
     return;
   }
   results.innerHTML = movies.map(movie => `
-    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col items-center cursor-pointer hover:bg-opacity-30 hover:scale-105 transition-all duration-200 border border-white/10" onclick='storeAndGoToDetailsNewTab(${JSON.stringify(movie).replace(/'/g, "&#39;")})'>
-      <div class="w-full aspect-[2/3] rounded-xl overflow-hidden mb-3 bg-gray-900 flex items-center justify-center">
+    <article class="bg-white bg-opacity-20 backdrop-blur-md rounded-2xl shadow-lg p-4 flex flex-col items-center cursor-pointer hover:bg-opacity-30 hover:scale-105 transition-all duration-200 border border-white/10" onclick='storeAndGoToDetailsNewTab(${JSON.stringify(movie).replace(/'/g, "&#39;")})'>
+      <span class="w-full aspect-[2/3] rounded-xl overflow-hidden mb-3 bg-gray-900 flex items-center justify-center">
         <img src="${movie.primaryImage || 'https://via.placeholder.com/300x450?text=No+Image'}" alt="${movie.primaryTitle}" class="object-cover w-full h-full"/>
-      </div>
-      <div class="font-extrabold text-lg text-center mb-1">${movie.primaryTitle}</div>
-      <div class="text-xs text-gray-300 mb-2">${movie.startYear || ''}</div>
-      <div class="flex flex-wrap gap-1 justify-center mb-2">${(movie.genres||[]).map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}</div>
-      <div class="flex items-center gap-2 text-xs text-gray-200">
+      </span>
+      <span class="font-extrabold text-lg text-center mb-1">${movie.primaryTitle}</span>
+      <span class="text-xs text-gray-300 mb-2">${movie.startYear || ''}</span>
+      <span class="flex flex-wrap gap-1 justify-center mb-2">${(movie.genres||[]).map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}</span>
+      <span class="flex items-center gap-2 text-xs text-gray-200">
         ${movie.averageRating ? `<span class='bg-yellow-400 text-black px-2 py-0.5 rounded-full font-bold'>⭐ ${movie.averageRating}</span>` : ''}
         ${movie.numVotes ? `<span class='bg-blue-500 text-white px-2 py-0.5 rounded-full'>${movie.numVotes.toLocaleString()} votes</span>` : ''}
-      </div>
-    </div>
+      </span>
+    </article>
   `).join('');
   results.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
