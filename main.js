@@ -100,7 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   if (document.getElementById('searchForm')) {
-    document.getElementById('searchForm').addEventListener('submit', async function(e) {
+    document.getElementById('searchForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const title = document.getElementById('title').value;
       const partialTitle = document.getElementById('partialTitle') ? document.getElementById('partialTitle').value : '';
@@ -163,7 +163,7 @@ function renderResults(movies) {
       </span>
       <span class="font-extrabold text-lg text-center mb-1">${movie.primaryTitle}</span>
       <span class="text-xs text-gray-300 mb-2">${movie.startYear || ''}</span>
-      <span class="flex flex-wrap gap-1 justify-center mb-2">${(movie.genres||[]).map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}</span>
+      <span class="flex flex-wrap gap-1 justify-center mb-2">${(movie.genres || []).map(g => `<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold'>${g}</span>`).join('')}</span>
       <span class="flex items-center gap-2 text-xs text-gray-200">
         ${movie.averageRating ? `<span class='bg-yellow-400 text-black px-2 py-0.5 rounded-full font-bold'>⭐ ${movie.averageRating}</span>` : ''}
         ${movie.numVotes ? `<span class='bg-blue-500 text-white px-2 py-0.5 rounded-full'>${movie.numVotes.toLocaleString()} votes</span>` : ''}
@@ -174,7 +174,7 @@ function renderResults(movies) {
 }
 
 if (document.getElementById('movieDetails')) {
-  (async function() {
+  (async function () {
     const movieStr = localStorage.getItem('selectedMovie');
     if (!movieStr) {
       document.getElementById('movieDetails').innerHTML = '<div class="text-red-400">Movie not found.</div>';
@@ -182,21 +182,18 @@ if (document.getElementById('movieDetails')) {
     }
     const movie = JSON.parse(movieStr);
     const movieId = movie.id;
-    
+
     document.getElementById('movieDetails').innerHTML = '<div class="w-full text-center">Loading...</div>';
-    
+
     try {
-      const [movieData, directorsData] = await Promise.all([
-        Promise.resolve(movie),
-        fetch(`https://${RAPIDAPI_HOST}/api/imdb/${movieId}/directors`, {
-          headers: {
-            'x-rapidapi-key': RAPIDAPI_KEY,
-            'x-rapidapi-host': RAPIDAPI_HOST
-          }
-        }).then(res => res.json())
-      ]);
-      
-      renderDetails(movieData, directorsData);
+      const directorsData = await fetch(`https://${RAPIDAPI_HOST}/api/imdb/${movieId}/directors`, {
+        headers: {
+          'x-rapidapi-key': RAPIDAPI_KEY,
+          'x-rapidapi-host': RAPIDAPI_HOST
+        }
+      }).then(res => res.json());
+
+      renderDetails(movie, directorsData);
     } catch (err) {
       console.error('Error loading movie details:', err);
       document.getElementById('movieDetails').innerHTML = '<div class="text-red-400">Error loading movie details.</div>';
@@ -217,7 +214,7 @@ function renderDetails(movie, directors = []) {
   const languages = movie.spokenLanguages || [];
   const trailer = movie.trailer || '';
   const imdbUrl = movie.url || '#';
-  
+
   let directorLine = '';
   if (directors && Array.isArray(directors) && directors.length > 0) {
     const directorNames = directors.map(d => d.fullName).join(', ');
@@ -248,7 +245,7 @@ function renderDetails(movie, directors = []) {
           <span class="text-3xl font-extrabold">${title}</span>
         </div>
         <div>
-          <span class="font-semibold text-pink-300">Genres:</span> ${genres.map(g=>`<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold ml-1'>${g}</span>`).join('')}
+          <span class="font-semibold text-pink-300">Genres:</span> ${genres.map(g => `<span class='bg-gradient-to-r from-pink-500 to-purple-500 text-xs px-2 py-0.5 rounded-full font-semibold ml-1'>${g}</span>`).join('')}
         </div>
         <div class="flex flex-wrap gap-2 items-center">
           <span class="font-semibold text-pink-300">Info:</span>
@@ -264,11 +261,11 @@ function renderDetails(movie, directors = []) {
         ${directorLine}
         <div class="flex flex-wrap gap-2 items-center">
           <span class="font-semibold text-pink-300">Country:</span>
-          ${countries.map(c=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${c}</span>`).join('')}
+          ${countries.map(c => `<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${c}</span>`).join('')}
         </div>
         <div class="flex flex-wrap gap-2 items-center">
           <span class="font-semibold text-pink-300">Language:</span>
-          ${languages.map(l=>`<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${l}</span>`).join('')}
+          ${languages.map(l => `<span class='bg-white bg-opacity-20 px-2 py-0.5 rounded text-xs ml-1'>${l}</span>`).join('')}
         </div>
       </div>
     </div>
